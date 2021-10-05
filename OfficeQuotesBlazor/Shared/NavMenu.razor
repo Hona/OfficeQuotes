@@ -1,7 +1,7 @@
 ﻿@using OfficeQuotes.Core.Models
 @using OfficeQuotesBlazor.Components
 @inject OfficeQuotesFullData OfficeQuotesFullData
-
+@inject NavigationManager _navigationManager
 <div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">OfficeQuotes.xyz</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -11,7 +11,7 @@
 
 <div class="@NavMenuCssClass">
     <ul class="nav flex-column">
-        @*<BSButton IsOutline="true" IsBlock="true" class="text-white">Random Episode</BSButton>*@
+        <BSButton IsOutline="true" IsBlock="true" class="text-white" OnClick='() => _navigationManager.NavigateTo("/Search")'>Search</BSButton>
         @{
             var seasons = OfficeQuotesFullData.EpisodeDataList.GroupBy(x => x.Season);
         }

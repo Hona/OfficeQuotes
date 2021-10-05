@@ -1,0 +1,59 @@
+﻿@page "/Search"
+@using InputType = BlazorStrap.InputType
+@using OfficeQuotes.Core.Models
+
+@inject OfficeQuotesFullData _officeQuotesFullData
+
+<h3>Search</h3>
+
+<BSForm OnValidSubmit="SearchQuotes" Model="_search">
+    <BSFormGroup>
+        <BSInput @bind-Value="((SearchModel)context.Model).Query" InputType="InputType.Text"/>
+    </BSFormGroup>
+    <BSFormGroup>
+        <BSButton ButtonType="ButtonType.Submit">Submit</BSButton>
+    </BSFormGroup>
+</BSForm>
+
+@if (_matches is null)
+{
+    
+}
+else if (!_matches.Any())
+{
+    <i>No results...</i>
+}
+else
+{
+    <span>
+        @_matches.Count results
+    </span>
+    
+    <BSListGroup>
+        @foreach (var quote in _matches)
+        {
+            <BSListGroupItem>
+                <h3>@quote.Episode.ToString()</h3>
+                <b>@quote.Quote.Character</b>: @quote.Quote.Text
+            </BSListGroupItem>
+        }
+    </BSListGroup>
+}
+
+@code {
+    private SearchModel _search = new SearchModel();
+    
+    private List<FullQuoteInfo> _matches;
+    
+    private void SearchQuotes()
+    {
+        _matches = _officeQuotesFullData.FullQuoteInfoList
+            .Where(x => x.Quote.Text.Contains(_search.Query, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+    }
+
+    private class SearchModel
+    {
+        public string Query { get; set; }
+    }
+}
