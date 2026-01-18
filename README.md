@@ -1,3 +1,3 @@
-# [OfficeQuotes.lukeparker.dev](https://officequotes.lukeparker.dev)
+# [OfficeQuotes.xyz](https://officequotes.xyz)
 
 > All the quotes from The Office (US)
