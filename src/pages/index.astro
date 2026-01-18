@@ -1,5 +1,6 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
+import SearchIsland from "../components/SearchIsland.jsx";
 import { getEpisodes, formatEpisodeId } from "../data/episodes.js";
 
 const episodes = getEpisodes();
@@ -54,21 +55,11 @@ const cards = [
     </div>
   </section>
 
-  <section class="search-box home-search">
-    <label>
-      <span class="search-meta">Start typing to search quotes.</span>
-      <input
-        type="search"
-        placeholder="Search quotes, characters, episodes"
-        aria-label="Search quotes"
-        data-home-search
-        autocomplete="off"
-      />
-    </label>
-    <div class="search-meta">Typing opens the full search page.</div>
+  <section id="search" class="home-search">
+    <SearchIsland client:load />
   </section>
 
-  <section class="card-grid">
+  <section class="card-grid" data-search-cards>
     {cards.map((card) => (
       <article class="quote-card">
         <img src={card.image} alt={`Portrait of ${card.name}`} loading="lazy" />
@@ -81,27 +72,4 @@ const cards = [
       </article>
     ))}
   </section>
-
-  <script is:inline>
-    const homeSearchInput = document.querySelector('[data-home-search]');
-    if (homeSearchInput) {
-      homeSearchInput.addEventListener('input', (event) => {
-        const value = event.target.value.trim();
-        if (!value || homeSearchInput.dataset.redirecting) return;
-        homeSearchInput.dataset.redirecting = '1';
-        const url = new URL('/search', window.location.origin);
-        url.searchParams.set('q', value);
-        window.location.href = `${url.pathname}${url.search}`;
-      });
-
-      homeSearchInput.addEventListener('keydown', (event) => {
-        if (event.key !== 'Enter') return;
-        const value = event.target.value.trim();
-        if (!value) return;
-        const url = new URL('/search', window.location.origin);
-        url.searchParams.set('q', value);
-        window.location.href = `${url.pathname}${url.search}`;
-      });
-    }
-  </script>
 </MainLayout>

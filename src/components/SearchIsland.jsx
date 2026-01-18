@@ -58,7 +58,10 @@ const SearchIsland = () => {
   }, []);
 
   useEffect(() => {
-    if (inputRef.current) {
+    const shouldFocus =
+      window.location.hash === "#search" ||
+      new URLSearchParams(window.location.search).has("q");
+    if (inputRef.current && shouldFocus) {
       inputRef.current.focus();
     }
   }, []);
@@ -71,6 +74,20 @@ const SearchIsland = () => {
       updateUrl(seed);
     }
   }, []);
+
+  useEffect(() => {
+    const cards = document.querySelector("[data-search-cards]");
+    if (!cards) return;
+    const active = query.trim().length >= MIN_QUERY_LENGTH;
+    cards.style.display = active ? "none" : "";
+  }, [query]);
+
+  useEffect(() => {
+    const resultsContainer = document.querySelector("[data-search-results]");
+    if (resultsContainer) {
+      resultsContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [results.length]);
 
   useEffect(() => {
     if (!indexRef.current || isLoading) return;
@@ -110,11 +127,16 @@ const SearchIsland = () => {
     if (query.trim().length < MIN_QUERY_LENGTH) {
       return `Keep typing... (${MIN_QUERY_LENGTH} characters minimum)`;
     }
+    if (results.length === 0) {
+      return "No results yet. Try a different phrase.";
+    }
     return `${results.length} result${results.length === 1 ? "" : "s"}`;
   }, [isLoading, query, results.length]);
 
+  const hasResults = results.length > 0 && query.trim().length >= MIN_QUERY_LENGTH;
+
   return (
-    <div className="search-box">
+    <div className="search-box" data-search-box>
       <label>
         <span className="search-meta">Search the archive</span>
         <input
@@ -127,20 +149,22 @@ const SearchIsland = () => {
         />
       </label>
       <div className="search-meta">{metaText}</div>
-      <div className="quote-list">
-        {results.map((entry) => (
-          <article className="quote-item" key={entry.id}>
-            <strong>{entry.character}</strong>: {entry.text}
-            <div className="search-meta">{entry.episodeName}</div>
-            <div className="search-meta">{formatEpisodeLabel(entry)}</div>
-            <div className="search-actions">
-              <a href={`/episode/${entry.episodeId}#${entry.anchorId}`}>
-                Jump to quote
-              </a>
-            </div>
-          </article>
-        ))}
-      </div>
+      {hasResults ? (
+        <div className="quote-list" data-search-results>
+          {results.map((entry) => (
+            <article className="quote-item" key={entry.id}>
+              <strong>{entry.character}</strong>: {entry.text}
+              <div className="search-meta">{entry.episodeName}</div>
+              <div className="search-meta">{formatEpisodeLabel(entry)}</div>
+              <div className="search-actions">
+                <a href={`/episode/${entry.episodeId}#${entry.anchorId}`}>
+                  Jump to quote
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 };

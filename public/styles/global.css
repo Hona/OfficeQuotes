@@ -265,9 +265,14 @@ main {
 }
 
 .home-search {
-  max-width: 520px;
+  max-width: 720px;
   margin-bottom: 32px;
 }
+
+.home-search input {
+  background: #fff;
+}
+
 
 .search-actions {
   display: flex;
@@ -308,6 +313,7 @@ main {
 
 .home-search input {
   background: #fff;
+  cursor: pointer;
 }
 
 .search-meta {
