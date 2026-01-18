@@ -5,19 +5,62 @@ import SeasonNav from "../components/SeasonNav.astro";
 const { title, description, canonical } = Astro.props;
 ---
 <BaseLayout title={title} description={description} canonical={canonical}>
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="brand">
-        OfficeQuotes.xyz
-        <span>All the quotes from The Office (US).</span>
-      </div>
-      <nav class="nav-links">
-        <a href="/">Home</a>
-      </nav>
-      <SeasonNav />
-    </aside>
-    <main class="content">
-      <slot />
-    </main>
+  <div class="page">
+    <header class="mobile-header">
+      <div class="mobile-brand">OfficeQuotes.xyz</div>
+      <button
+        class="menu-toggle"
+        type="button"
+        data-nav-toggle
+        aria-expanded="false"
+        aria-controls="site-nav"
+      >
+        Menu
+      </button>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" id="site-nav" data-nav>
+        <div class="brand">
+          OfficeQuotes.xyz
+          <span>All the quotes from The Office (US).</span>
+        </div>
+        <nav class="nav-links">
+          <a href="/">Home</a>
+        </nav>
+        <SeasonNav />
+      </aside>
+      <main class="content">
+        <slot />
+      </main>
+    </div>
+    <div class="nav-backdrop" data-nav-backdrop></div>
   </div>
+  <script is:inline>
+    const navToggle = document.querySelector('[data-nav-toggle]');
+    const navBackdrop = document.querySelector('[data-nav-backdrop]');
+    const nav = document.querySelector('[data-nav]');
+
+    if (navToggle && navBackdrop && nav) {
+      const setOpen = (open) => {
+        document.body.classList.toggle('nav-open', open);
+        navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      };
+
+      navToggle.addEventListener('click', () => {
+        const open = !document.body.classList.contains('nav-open');
+        setOpen(open);
+      });
+
+      navBackdrop.addEventListener('click', () => setOpen(false));
+      nav.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => setOpen(false));
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          setOpen(false);
+        }
+      });
+    }
+  </script>
 </BaseLayout>

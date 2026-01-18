@@ -32,6 +32,10 @@ body {
   background: radial-gradient(circle at top left, #fbf7ef 0%, var(--paper) 45%, var(--paper-dark) 100%);
 }
 
+body.nav-open {
+  overflow: hidden;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -46,9 +50,56 @@ main {
   flex: 1;
 }
 
+.page {
+  min-height: 100vh;
+}
+
 .layout {
   display: flex;
   min-height: 100vh;
+}
+
+.mobile-header {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(180deg, #3b2f24 0%, #241a14 100%);
+  color: #f8f0e5;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.mobile-brand {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+}
+
+.menu-toggle {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fdf8f2;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+
+.nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 14, 10, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 15;
+}
+
+body.nav-open .nav-backdrop {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .sidebar {
@@ -60,6 +111,7 @@ main {
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  z-index: 20;
 }
 
 .brand {
@@ -104,6 +156,12 @@ main {
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+@media (max-width: 960px) {
+  .season-list {
+    padding-bottom: 32px;
+  }
 }
 
 .season-group {
@@ -321,17 +379,29 @@ main {
 }
 
 @media (max-width: 960px) {
+  .mobile-header {
+    display: flex;
+  }
+
   .layout {
-    flex-direction: column;
+    display: block;
   }
 
   .sidebar {
-    width: 100%;
-    position: relative;
-    height: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: min(320px, 82vw);
+    transform: translateX(-110%);
+    transition: transform 0.25s ease;
+  }
+
+  body.nav-open .sidebar {
+    transform: translateX(0);
   }
 
   .content {
-    padding: 32px 20px 64px;
+    padding: 24px 20px 64px;
   }
 }
