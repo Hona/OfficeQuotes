@@ -281,6 +281,9 @@ public/search-index.json
 public/sitemap.xml
 public/robots.txt
 
+# npm lockfile
+package-lock.json
+
 # Scraper outputs
 src/data/episodes/
 src/data/characters/
