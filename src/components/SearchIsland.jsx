@@ -82,12 +82,6 @@ const SearchIsland = () => {
     cards.style.display = active ? "none" : "";
   }, [query]);
 
-  useEffect(() => {
-    const resultsContainer = document.querySelector("[data-search-results]");
-    if (resultsContainer) {
-      resultsContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [results.length]);
 
   useEffect(() => {
     if (!indexRef.current || isLoading) return;
