@@ -1,0 +1,24 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import SeasonNav from "../components/SeasonNav.astro";
+
+const { title, description, canonical } = Astro.props;
+---
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        OfficeQuotes.xyz
+        <span>All the quotes from The Office (US).</span>
+      </div>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/search">Search</a>
+      </nav>
+      <SeasonNav />
+    </aside>
+    <main class="content">
+      <slot />
+    </main>
+  </div>
+</BaseLayout>

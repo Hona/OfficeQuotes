@@ -276,6 +276,15 @@ node_modules/
 .astro/
 dist/
 
+# Generated static assets
+public/search-index.json
+public/sitemap.xml
+public/robots.txt
+
+# Scraper outputs
+src/data/episodes/
+src/data/characters/
+
 # Visual Studio 6 build log
 *.plg
 

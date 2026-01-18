@@ -1,0 +1,34 @@
+---
+import MainLayout from "../../layouts/MainLayout.astro";
+import { getEpisodeIds, getEpisodeById, formatEpisodeId } from "../../data/episodes.js";
+
+export async function getStaticPaths() {
+  const episodes = getEpisodeIds();
+  return episodes.map((episodeId) => ({ params: { episodeId } }));
+}
+
+const { episodeId } = Astro.params;
+const episode = getEpisodeById(episodeId);
+
+if (!episode) {
+  throw new Error(`Episode not found: ${episodeId}`);
+}
+
+const title = `${formatEpisodeId(episode.season, episode.episode)} - ${episode.episode_name} | OfficeQuotes.xyz`;
+const description = `Quotes from ${episode.episode_name} (Season ${episode.season}, Episode ${episode.episode}).`;
+const canonical = `https://officequotes.xyz/episode/${episodeId}`;
+---
+<MainLayout title={title} description={description} canonical={canonical}>
+  <header class="episode-header">
+    <h1>{episode.episode_name}</h1>
+    <span>Season {episode.season} - Episode {episode.episode} - {episodeId}</span>
+  </header>
+
+  <section class="quote-list">
+    {episode.all_quotes.map((quote) => (
+      <article class="quote-item">
+        <strong>{quote.character}</strong>: {quote.text}
+      </article>
+    ))}
+  </section>
+</MainLayout>
