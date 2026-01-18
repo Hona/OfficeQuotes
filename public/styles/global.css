@@ -224,10 +224,16 @@ main {
   border: 1px solid var(--border);
   padding: 16px 20px;
   box-shadow: 0 12px 30px rgba(39, 28, 18, 0.08);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .quote-item strong {
   font-family: var(--font-serif);
+}
+
+.quote-item:target {
+  border-color: rgba(179, 104, 61, 0.6);
+  box-shadow: 0 0 0 2px rgba(179, 104, 61, 0.2), 0 16px 40px rgba(39, 28, 18, 0.18);
 }
 
 .quote-item .search-meta {
@@ -256,6 +262,29 @@ main {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.search-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.search-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(179, 104, 61, 0.12);
+  color: var(--accent-dark);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.search-actions a:hover {
+  background: rgba(179, 104, 61, 0.2);
 }
 
 .search-box label {

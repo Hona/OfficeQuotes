@@ -35,7 +35,8 @@ const buildSearchIndex = async (episodes) => {
     const episodeId = formatEpisodeId(episode.season, episode.episode);
     const episodeLabel = `Season ${episode.season} Episode ${episode.episode}`;
 
-    episode.all_quotes.forEach((quote) => {
+    episode.all_quotes.forEach((quote, quoteIndex) => {
+      const anchorId = `quote-${episodeId}-${quoteIndex}`;
       const item = {
         id,
         episodeId,
@@ -43,7 +44,9 @@ const buildSearchIndex = async (episodes) => {
         season: episode.season,
         episode: episode.episode,
         character: quote.character,
-        text: quote.text
+        text: quote.text,
+        quoteIndex,
+        anchorId
       };
 
       items.push(item);

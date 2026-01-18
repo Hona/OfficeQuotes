@@ -25,8 +25,8 @@ const canonical = `https://officequotes.xyz/episode/${episodeId}`;
   </header>
 
   <section class="quote-list">
-    {episode.all_quotes.map((quote) => (
-      <article class="quote-item">
+    {episode.all_quotes.map((quote, index) => (
+      <article class="quote-item" id={`quote-${episodeId}-${index}`}>
         <strong>{quote.character}</strong>: {quote.text}
       </article>
     ))}

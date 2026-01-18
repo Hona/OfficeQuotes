@@ -103,6 +103,11 @@ const SearchIsland = () => {
             <strong>{entry.character}</strong>: {entry.text}
             <div className="search-meta">{entry.episodeName}</div>
             <div className="search-meta">{formatEpisodeLabel(entry)}</div>
+            <div className="search-actions">
+              <a href={`/episode/${entry.episodeId}#${entry.anchorId}`}>
+                Jump to quote
+              </a>
+            </div>
           </article>
         ))}
       </div>
