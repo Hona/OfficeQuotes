@@ -24,6 +24,7 @@ const SearchIsland = () => {
   const [isLoading, setIsLoading] = useState(true);
   const indexRef = useRef(null);
   const debounceRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     let active = true;
@@ -43,6 +44,12 @@ const SearchIsland = () => {
     return () => {
       active = false;
     };
+  }, []);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
   }, []);
 
   useEffect(() => {
@@ -89,6 +96,7 @@ const SearchIsland = () => {
       <label>
         <span className="search-meta">Search the archive</span>
         <input
+          ref={inputRef}
           type="search"
           placeholder="Try: pretzel day, dunder mifflin, jim"
           value={query}
