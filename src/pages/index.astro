@@ -6,11 +6,12 @@ const episodes = getEpisodes();
 const findRandomQuote = (name) => {
   const allQuotes = episodes.flatMap((episode) =>
     episode.all_quotes
-      .filter((quote) => quote.character.toLowerCase().includes(name))
-      .map((quote) => ({
+      .map((quote, quoteIndex) => ({
         quote,
+        quoteIndex,
         episode
       }))
+      .filter((entry) => entry.quote.character.toLowerCase().includes(name))
   );
 
   return allQuotes[Math.floor(Math.random() * allQuotes.length)];
@@ -60,8 +61,8 @@ const cards = [
         <div class="meta">{card.name}</div>
         <h3>{card.data.episode.episode_name}</h3>
         <p>"{card.data.quote.text}"</p>
-        <a href={`/episode/${formatEpisodeId(card.data.episode.season, card.data.episode.episode)}`}>
-          See full episode ->
+        <a href={`/episode/${formatEpisodeId(card.data.episode.season, card.data.episode.episode)}#quote-${formatEpisodeId(card.data.episode.season, card.data.episode.episode)}-${card.data.quoteIndex}`}>
+          Jump to quote ->
         </a>
       </article>
     ))}
