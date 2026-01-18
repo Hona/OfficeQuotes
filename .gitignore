@@ -272,6 +272,25 @@ FakesAssemblies/
 .ntvs_analysis.dat
 node_modules/
 
+# Astro
+.astro/
+dist/
+
+# Generated static assets
+public/search-index.json
+public/sitemap.xml
+public/robots.txt
+
+# npm lockfile
+package-lock.json
+
+# Astro generated types
+src/env.d.ts
+
+# Scraper outputs
+src/data/episodes/
+src/data/characters/
+
 # Visual Studio 6 build log
 *.plg
 

@@ -1,0 +1,16 @@
+{
+  "name": "officequotes-xyz",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/build-static.mjs && astro dev",
+    "build": "node scripts/build-static.mjs && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/preact": "^3.5.4",
+    "astro": "^4.16.7",
+    "flexsearch": "^0.7.43",
+    "preact": "^10.24.0"
+  }
+}

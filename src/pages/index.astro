@@ -1,0 +1,75 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import SearchIsland from "../components/SearchIsland.jsx";
+import { getEpisodes, formatEpisodeId } from "../data/episodes.js";
+
+const episodes = getEpisodes();
+const findRandomQuote = (name) => {
+  const allQuotes = episodes.flatMap((episode) =>
+    episode.all_quotes
+      .map((quote, quoteIndex) => ({
+        quote,
+        quoteIndex,
+        episode
+      }))
+      .filter((entry) => entry.quote.character.toLowerCase().includes(name))
+  );
+
+  return allQuotes[Math.floor(Math.random() * allQuotes.length)];
+};
+
+const dwight = findRandomQuote("dwight");
+const michael = findRandomQuote("michael");
+const creed = findRandomQuote("creed");
+
+const cards = [
+  {
+    name: "Dwight",
+    image: "/img/dwight_portrait.jpg",
+    data: dwight
+  },
+  {
+    name: "Michael",
+    image: "/img/michael_portrait.jpg",
+    data: michael
+  },
+  {
+    name: "Creed",
+    image: "/img/creed_portrait.jpg",
+    data: creed
+  }
+];
+---
+<MainLayout
+  title="OfficeQuotes.xyz - The Office Quotes"
+  description="All the quotes from The Office (US)."
+  canonical="https://officequotes.xyz/"
+>
+  <section class="hero">
+    <div>
+      <h1>Every Office quote, searchable and fast.</h1>
+      <p>
+        A lovingly curated catalog of The Office (US) dialogue. Explore by season,
+        dive into every episode, or search the entire archive instantly.
+      </p>
+    </div>
+  </section>
+
+  <section id="search" class="home-search">
+    <SearchIsland client:load />
+  </section>
+
+  <section class="card-grid" data-search-cards>
+    {cards.map((card) => (
+      <article class="quote-card">
+        <img src={card.image} alt={`Portrait of ${card.name}`} loading="lazy" />
+        <div class="meta">{card.name}</div>
+        <h3>{card.data.episode.episode_name}</h3>
+        <p>"{card.data.quote.text}"</p>
+        <a href={`/episode/${formatEpisodeId(card.data.episode.season, card.data.episode.episode)}#quote-${formatEpisodeId(card.data.episode.season, card.data.episode.episode)}-${card.data.quoteIndex}`}>
+          Jump to quote ->
+        </a>
+      </article>
+    ))}
+  </section>
+</MainLayout>

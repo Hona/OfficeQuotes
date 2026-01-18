@@ -1,0 +1,17 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+
+const title = "Page not found | OfficeQuotes.xyz";
+const description = "The page you were looking for could not be found.";
+const canonical = "https://officequotes.xyz/404";
+---
+<MainLayout title={title} description={description} canonical={canonical}>
+  <section class="hero">
+    <div>
+      <h1>That page went missing.</h1>
+      <p>
+        Try heading back to the home page or use the search to find a quote.
+      </p>
+    </div>
+  </section>
+</MainLayout>
