@@ -26,6 +26,17 @@ const SearchIsland = () => {
   const debounceRef = useRef(null);
   const inputRef = useRef(null);
 
+  const updateUrl = (value) => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (value) {
+      url.searchParams.set("q", value);
+    } else {
+      url.searchParams.delete("q");
+    }
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  };
+
   useEffect(() => {
     let active = true;
     fetch("/search-index.json")
@@ -53,6 +64,15 @@ const SearchIsland = () => {
   }, []);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const seed = params.get("q");
+    if (seed) {
+      setQuery(seed);
+      updateUrl(seed);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!indexRef.current || isLoading) return;
 
     if (debounceRef.current) {
@@ -62,6 +82,7 @@ const SearchIsland = () => {
     const normalized = query.trim();
     if (normalized.length < MIN_QUERY_LENGTH) {
       setResults([]);
+      updateUrl(normalized.length ? normalized : "");
       return;
     }
 
@@ -69,6 +90,7 @@ const SearchIsland = () => {
       const matches = indexRef.current.search(normalized, 200);
       const mapped = matches.map((id) => items[id]).filter(Boolean);
       setResults(mapped);
+      updateUrl(normalized);
     }, DEBOUNCE_MS);
 
     return () => {

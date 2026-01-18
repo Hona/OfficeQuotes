@@ -264,6 +264,11 @@ main {
   gap: 12px;
 }
 
+.home-search {
+  max-width: 520px;
+  margin-bottom: 32px;
+}
+
 .search-actions {
   display: flex;
   gap: 10px;
@@ -299,6 +304,10 @@ main {
   padding: 10px 12px;
   font-size: 1rem;
   font-family: var(--font-sans);
+}
+
+.home-search input {
+  background: #fff;
 }
 
 .search-meta {
