@@ -14,11 +14,28 @@ if (!episode) {
   throw new Error(`Episode not found: ${episodeId}`);
 }
 
-const title = `${formatEpisodeId(episode.season, episode.episode)} - ${episode.episode_name} | OfficeQuotes.xyz`;
-const description = `Quotes from ${episode.episode_name} (Season ${episode.season}, Episode ${episode.episode}).`;
+const episodeLabel = formatEpisodeId(episode.season, episode.episode);
+const title = `${episode.episode_name} (${episodeLabel}) - The Office (US) Quotes | OfficeQuotes.xyz`;
+const description = `Every quote from The Office (US) episode ${episode.episode_name} (Season ${episode.season}, Episode ${episode.episode}). Search and browse the full dialogue.`;
 const canonical = `https://officequotes.xyz/episode/${episodeId}`;
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "TVEpisode",
+  name: episode.episode_name,
+  episodeNumber: episode.episode,
+  seasonNumber: episode.season,
+  partOfSeries: {
+    "@type": "TVSeries",
+    name: "The Office (US)"
+  },
+  url: canonical,
+  description
+};
 ---
 <MainLayout title={title} description={description} canonical={canonical}>
+  <script type="application/ld+json">
+    {JSON.stringify(jsonLd)}
+  </script>
   <header class="episode-header">
     <h1>{episode.episode_name}</h1>
     <span>Season {episode.season} - Episode {episode.episode} - {episodeId}</span>
