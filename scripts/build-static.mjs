@@ -1,10 +1,21 @@
 import fs from "node:fs";
 import path from "node:path";
+import flexsearch from "flexsearch";
+
+const { Index } = flexsearch;
 
 const root = process.cwd();
 const site = "https://officequotes.xyz";
 const publicDir = path.join(root, "public");
 const dataPath = path.join(root, "src", "data", "episodes_data_small.json");
+
+const SEARCH_OPTIONS = {
+  tokenize: "forward",
+  cache: 100,
+  resolution: 9,
+  depth: 3,
+  minlength: 3
+};
 
 const formatEpisodeId = (season, episode) =>
   `S${season}E${String(episode).padStart(2, "0")}`;
@@ -16,22 +27,47 @@ const ensureDir = (dir) => {
 };
 
 const buildSearchIndex = (episodes) => {
-  const index = episodes.flatMap((episode) => {
+  const index = new Index(SEARCH_OPTIONS);
+  const items = [];
+  let id = 0;
+
+  episodes.forEach((episode) => {
     const episodeId = formatEpisodeId(episode.season, episode.episode);
-    return episode.all_quotes.map((quote, idx) => ({
-      id: `${episodeId}-${idx}`,
-      episodeId,
-      episodeName: episode.episode_name,
-      season: episode.season,
-      episode: episode.episode,
-      character: quote.character,
-      text: quote.text
-    }));
+    const episodeLabel = `Season ${episode.season} Episode ${episode.episode}`;
+
+    episode.all_quotes.forEach((quote) => {
+      const item = {
+        id,
+        episodeId,
+        episodeName: episode.episode_name,
+        season: episode.season,
+        episode: episode.episode,
+        character: quote.character,
+        text: quote.text
+      };
+
+      items.push(item);
+      const searchable = `${quote.text} ${quote.character} ${episode.episode_name} ${episodeId} ${episodeLabel}`;
+      index.add(id, searchable);
+      id += 1;
+    });
   });
+
+  const serialized = [];
+  index.export((key, data) => {
+    if (data !== undefined) {
+      serialized.push({ key, data });
+    }
+  });
+
+  const payload = {
+    index: serialized,
+    items
+  };
 
   fs.writeFileSync(
     path.join(publicDir, "search-index.json"),
-    JSON.stringify(index)
+    JSON.stringify(payload)
   );
 };
 

@@ -1,12 +1,17 @@
-import { useEffect, useMemo, useState } from "preact/hooks";
-import Fuse from "fuse.js";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
+import flexsearch from "flexsearch";
 
-const fuseOptions = {
-  includeScore: true,
-  threshold: 0.35,
-  ignoreLocation: true,
-  minMatchCharLength: 2,
-  keys: ["text", "character", "episodeName", "episodeId"]
+const { Index } = flexsearch;
+
+const MIN_QUERY_LENGTH = 3;
+const DEBOUNCE_MS = 200;
+
+const SEARCH_OPTIONS = {
+  tokenize: "forward",
+  cache: 100,
+  resolution: 9,
+  depth: 3,
+  minlength: MIN_QUERY_LENGTH
 };
 
 const formatEpisodeLabel = (entry) =>
@@ -14,24 +19,70 @@ const formatEpisodeLabel = (entry) =>
 
 const SearchIsland = () => {
   const [query, setQuery] = useState("");
-  const [index, setIndex] = useState([]);
+  const [items, setItems] = useState([]);
+  const [results, setResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const indexRef = useRef(null);
+  const debounceRef = useRef(null);
 
   useEffect(() => {
     let active = true;
     fetch("/search-index.json")
       .then((res) => res.json())
       .then((data) => {
-        if (active) setIndex(data);
+        if (!active) return;
+        const index = new Index(SEARCH_OPTIONS);
+        data.index.forEach((chunk) => index.import(chunk.key, chunk.data));
+        indexRef.current = index;
+        setItems(data.items);
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
       });
+
     return () => {
       active = false;
     };
   }, []);
 
-  const fuse = useMemo(() => new Fuse(index, fuseOptions), [index]);
-  const results = query.trim()
-    ? fuse.search(query.trim(), { limit: 200 }).map((entry) => entry.item)
-    : [];
+  useEffect(() => {
+    if (!indexRef.current || isLoading) return;
+
+    if (debounceRef.current) {
+      window.clearTimeout(debounceRef.current);
+    }
+
+    const normalized = query.trim();
+    if (normalized.length < MIN_QUERY_LENGTH) {
+      setResults([]);
+      return;
+    }
+
+    debounceRef.current = window.setTimeout(() => {
+      const matches = indexRef.current.search(normalized, 200);
+      const mapped = matches.map((id) => items[id]).filter(Boolean);
+      setResults(mapped);
+    }, DEBOUNCE_MS);
+
+    return () => {
+      if (debounceRef.current) {
+        window.clearTimeout(debounceRef.current);
+      }
+    };
+  }, [items, query, isLoading]);
+
+  const metaText = useMemo(() => {
+    if (isLoading) {
+      return "Loading search index...";
+    }
+    if (query.trim().length === 0) {
+      return "Type to search every line.";
+    }
+    if (query.trim().length < MIN_QUERY_LENGTH) {
+      return `Keep typing... (${MIN_QUERY_LENGTH} characters minimum)`;
+    }
+    return `${results.length} result${results.length === 1 ? "" : "s"}`;
+  }, [isLoading, query, results.length]);
 
   return (
     <div className="search-box">
@@ -45,11 +96,7 @@ const SearchIsland = () => {
           aria-label="Search quotes"
         />
       </label>
-      <div className="search-meta">
-        {query.trim().length === 0
-          ? "Type to search every line."
-          : `${results.length} result${results.length === 1 ? "" : "s"}`}
-      </div>
+      <div className="search-meta">{metaText}</div>
       <div className="quote-list">
         {results.map((entry) => (
           <article className="quote-item" key={entry.id}>

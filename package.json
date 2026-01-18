@@ -10,7 +10,7 @@
   "dependencies": {
     "@astrojs/preact": "^3.5.4",
     "astro": "^4.16.7",
-    "fuse.js": "^7.0.0",
+    "flexsearch": "^0.7.43",
     "preact": "^10.24.0"
   }
 }
