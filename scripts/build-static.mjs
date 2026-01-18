@@ -26,7 +26,7 @@ const ensureDir = (dir) => {
   }
 };
 
-const buildSearchIndex = (episodes) => {
+const buildSearchIndex = async (episodes) => {
   const index = new Index(SEARCH_OPTIONS);
   const items = [];
   let id = 0;
@@ -54,7 +54,7 @@ const buildSearchIndex = (episodes) => {
   });
 
   const serialized = [];
-  index.export((key, data) => {
+  await index.export((key, data) => {
     if (data !== undefined) {
       serialized.push({ key, data });
     }
@@ -123,12 +123,12 @@ const buildRobots = () => {
   fs.writeFileSync(path.join(publicDir, "robots.txt"), robots);
 };
 
-const main = () => {
+const main = async () => {
   ensureDir(publicDir);
   const episodes = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
-  buildSearchIndex(episodes);
+  await buildSearchIndex(episodes);
   buildSitemap(episodes);
   buildRobots();
 };
 
-main();
+await main();
