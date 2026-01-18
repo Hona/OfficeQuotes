@@ -29,27 +29,21 @@ const ensureDir = (dir) => {
 const buildSearchIndex = async (episodes) => {
   const index = new Index(SEARCH_OPTIONS);
   const items = [];
+  const episodeMeta = {};
   let id = 0;
 
   episodes.forEach((episode) => {
     const episodeId = formatEpisodeId(episode.season, episode.episode);
     const episodeLabel = `Season ${episode.season} Episode ${episode.episode}`;
+    episodeMeta[episodeId] = episode.episode_name;
 
     episode.all_quotes.forEach((quote, quoteIndex) => {
-      const anchorId = `quote-${episodeId}-${quoteIndex}`;
-      const item = {
-        id,
+      items.push([
         episodeId,
-        episodeName: episode.episode_name,
-        season: episode.season,
-        episode: episode.episode,
-        character: quote.character,
-        text: quote.text,
         quoteIndex,
-        anchorId
-      };
-
-      items.push(item);
+        quote.character,
+        quote.text
+      ]);
       const searchable = `${quote.text} ${quote.character} ${episode.episode_name} ${episodeId} ${episodeLabel}`;
       index.add(id, searchable);
       id += 1;
@@ -65,7 +59,8 @@ const buildSearchIndex = async (episodes) => {
 
   const payload = {
     index: serialized,
-    items
+    items,
+    episodeMeta
   };
 
   fs.writeFileSync(

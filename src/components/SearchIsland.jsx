@@ -14,12 +14,18 @@ const SEARCH_OPTIONS = {
   minlength: MIN_QUERY_LENGTH
 };
 
-const formatEpisodeLabel = (entry) =>
-  `Season ${entry.season} - Episode ${entry.episode} - ${entry.episodeId}`;
+const parseEpisodeLabel = (episodeId) => {
+  const match = /S(\d+)E(\d+)/i.exec(episodeId);
+  if (!match) return episodeId;
+  const season = Number(match[1]);
+  const episode = Number(match[2]);
+  return `Season ${season} - Episode ${episode} - ${episodeId}`;
+};
 
 const SearchIsland = () => {
   const [query, setQuery] = useState("");
   const [items, setItems] = useState([]);
+  const [episodeMeta, setEpisodeMeta] = useState({});
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const indexRef = useRef(null);
@@ -47,6 +53,7 @@ const SearchIsland = () => {
         data.index.forEach((chunk) => index.import(chunk.key, chunk.data));
         indexRef.current = index;
         setItems(data.items);
+        setEpisodeMeta(data.episodeMeta || {});
       })
       .finally(() => {
         if (active) setIsLoading(false);
@@ -99,7 +106,13 @@ const SearchIsland = () => {
 
     debounceRef.current = window.setTimeout(() => {
       const matches = indexRef.current.search(normalized, 200);
-      const mapped = matches.map((id) => items[id]).filter(Boolean);
+      const mapped = matches
+        .map((id) => {
+          const item = items[id];
+          if (!item) return null;
+          return { id, item };
+        })
+        .filter(Boolean);
       setResults(mapped);
       updateUrl(normalized);
     }, DEBOUNCE_MS);
@@ -145,18 +158,23 @@ const SearchIsland = () => {
       <div className="search-meta">{metaText}</div>
       {hasResults ? (
         <div className="quote-list" data-search-results>
-          {results.map((entry) => (
-            <article className="quote-item" key={entry.id}>
-              <strong>{entry.character}</strong>: {entry.text}
-              <div className="search-meta">{entry.episodeName}</div>
-              <div className="search-meta">{formatEpisodeLabel(entry)}</div>
-              <div className="search-actions">
-                <a href={`/episode/${entry.episodeId}#${entry.anchorId}`}>
-                  Jump to quote
-                </a>
-              </div>
-            </article>
-          ))}
+          {results.map(({ id, item }) => {
+            const [episodeId, quoteIndex, character, text] = item;
+            const episodeName = episodeMeta[episodeId] || episodeId;
+            const anchorId = `quote-${episodeId}-${quoteIndex}`;
+            return (
+              <article className="quote-item" key={id}>
+                <strong>{character}</strong>: {text}
+                <div className="search-meta">{episodeName}</div>
+                <div className="search-meta">{parseEpisodeLabel(episodeId)}</div>
+                <div className="search-actions">
+                  <a href={`/episode/${episodeId}#${anchorId}`}>
+                    Jump to quote
+                  </a>
+                </div>
+              </article>
+            );
+          })}
         </div>
       ) : null}
     </div>
